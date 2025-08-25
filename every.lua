@@ -1,5 +1,5 @@
 local OrionLib = loadstring(game:HttpGet(
-                                ('https://raw.githubusercontent.com/ionlyusegithubformcmods/1-Line-Scripts/main/Mobile%20Friendly%20Orion')))()
+    ('https://raw.githubusercontent.com/ionlyusegithubformcmods/1-Line-Scripts/main/Mobile%20Friendly%20Orion')))()
 
 local Window = OrionLib:MakeWindow({
     Name = "Buchinyan Hub | Every second add +1 skill point",
@@ -18,21 +18,19 @@ game:GetService("GuiService"):SetGameplayPausedNotificationEnabled(false)
 
 local Section = Tab:AddSection({Name = "Sword and punch"})
 
+-- Hit all dummies by sword or punch (enabled by default)
 Tab:AddToggle({
     Name = "Hit all dummies by sword or punch",
-    Default = false,
+    Default = true, -- ON by default
     Callback = function(Value)
         ooj = Value
         while ooj and game:GetService("RunService").RenderStepped:Wait() do
             local LP = game:GetService("Players").LocalPlayer
-            local tool = LP.Character and
-                             LP.Character:FindFirstChildOfClass("Tool")
+            local tool = LP.Character and LP.Character:FindFirstChildOfClass("Tool")
             if tool and tool:FindFirstChild("Handle") then
                 tool:Activate()
                 for i, v in next, workspace:GetDescendants() do
-                    if v:IsA("Humanoid") and
-                        not game:GetService("Players")
-                            :GetPlayerFromCharacter(v.Parent) then
+                    if v:IsA("Humanoid") and not game:GetService("Players"):GetPlayerFromCharacter(v.Parent) then
                         for i, d in next, v.Parent:GetDescendants() do
                             if d:IsA("BasePart") then
                                 coroutine.wrap(function()
@@ -47,7 +45,9 @@ Tab:AddToggle({
         end
     end
 })
+task.delay(1, function() ooj = true end)
 
+-- Hit all players by sword or punch (manual toggle)
 Tab:AddToggle({
     Name = "Hit all players by sword or punch",
     Default = false,
@@ -58,8 +58,7 @@ Tab:AddToggle({
             local p = game.Players:GetPlayers()
             for i = 2, #p do
                 local v = p[i].Character
-                local tool = LP.Character and
-                                 LP.Character:FindFirstChildOfClass("Tool")
+                local tool = LP.Character and LP.Character:FindFirstChildOfClass("Tool")
                 if tool and tool:FindFirstChild("Handle") then
                     tool:Activate()
                     for i, v in next, v:GetChildren() do
@@ -74,58 +73,36 @@ Tab:AddToggle({
     end
 })
 
+-- Instant sword kill nearest dummies (enabled by default)
 local iehh = false
 Tab:AddToggle({
     Name = "Instant sword kill nearest dummies",
-    Default = false,
+    Default = true, -- ON by default
     Callback = function(Value)
         iehh = Value
         while iehh and task.wait() do
             if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") and
-                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
-                    :FindFirstChild("Handle") then
+                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("Handle") then
                 local humanoids = {}
-                for _, part in next,
-                               game.Workspace:GetPartBoundsInRadius(
-                                   game.Players.LocalPlayer.Character
-                                       .HumanoidRootPart.Position, 40) do
+                for _, part in next, game.Workspace:GetPartBoundsInRadius(
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.Position, 40) do
                     if part.Parent:IsA("Model") and
                         part.Parent:FindFirstChildOfClass("Humanoid") and
-                        not part:IsDescendantOf(
-                            game.Players.LocalPlayer.Character) then
-                        if not table.find(humanoids,
-                                          part.Parent:FindFirstChildOfClass(
-                                              "Humanoid")) then
-                            table.insert(humanoids,
-                                         part.Parent:FindFirstChildOfClass(
-                                             "Humanoid"))
+                        not part:IsDescendantOf(game.Players.LocalPlayer.Character) then
+                        if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+                            table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
                         end
                     end
                 end
 
                 for _, humanoid in next, humanoids do
                     coroutine.wrap(function()
-                        firetouchinterest(
-                            game.Players.LocalPlayer.Character.HumanoidRootPart,
-                            humanoid.RootPart, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, humanoid.RootPart, 0)
                         for _, part in next, humanoid.Parent:GetDescendants() do
                             if part:IsA("BasePart") then
-                                firetouchinterest(
-                                    game.Players.LocalPlayer.Character:FindFirstChildOfClass(
-                                        "Tool").Handle, part, 0)
+                                firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle, part, 0)
                             end
                         end
-
-                        coroutine.wrap(function()
-                            game.Players.LocalPlayer.SimulationRadius =
-                                math.huge
-                            sethiddenproperty(game.Players.LocalPlayer,
-                                              "MaxSimulationRadius", math.huge)
-                            settings().Network.IncomingReplicationLag = 0
-                            game:GetService("TestService").IsSleepAllowed =
-                                false
-                        end)()
-
                         humanoid.Health = 0
                         humanoid:TakeDamage(math.huge)
                         humanoid:ChangeState("Dead")
@@ -135,50 +112,42 @@ Tab:AddToggle({
         end
     end
 })
+task.delay(1, function() iehh = true end)
 
+-- Teleport to boss torso when instant kill is on
 Tab:AddToggle({
     Name = "Teleport to boss torso at instant sword kill",
     Default = false,
     Callback = function(Value)
         pei = Value
         while pei and task.wait() do
-            if iehh == true and
-                game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+            if iehh == true and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") then
                 local humanoids = {}
-                for _, part in next,
-                               workspace:GetPartBoundsInRadius(
-                                   game.Players.LocalPlayer.Character
-                                       .HumanoidRootPart.Position, 100) do
+                for _, part in next, workspace:GetPartBoundsInRadius(
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.Position, 100) do
                     if part.Parent:IsA("Model") and
                         part.Parent:FindFirstChildOfClass("Humanoid") and
-                        not part:IsDescendantOf(
-                            game.Players.LocalPlayer.Character) and
+                        not part:IsDescendantOf(game.Players.LocalPlayer.Character) and
                         part.Parent:IsDescendantOf(game.Workspace.mobs.BOSS) and
-                        part.Parent:FindFirstChildOfClass("Humanoid"):GetState() ~=
-                        "Dead" and
+                        part.Parent:FindFirstChildOfClass("Humanoid"):GetState() ~= "Dead" and
                         part.Parent:FindFirstChildOfClass("Humanoid").Health > 0 then
-                        if not table.find(humanoids,
-                                          part.Parent:FindFirstChildOfClass(
-                                              "Humanoid")) then
-                            table.insert(humanoids,
-                                         part.Parent:FindFirstChildOfClass(
-                                             "Humanoid"))
+                        if not table.find(humanoids, part.Parent:FindFirstChildOfClass("Humanoid")) then
+                            table.insert(humanoids, part.Parent:FindFirstChildOfClass("Humanoid"))
                         end
                     end
                 end
 
                 for _, humanoid in next, humanoids do
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
-                        humanoid.RootPart.CFrame *
-                            CFrame.new(0, humanoid.RootPart.Size.Y, 0)
+                        humanoid.RootPart.CFrame * CFrame.new(0, humanoid.RootPart.Size.Y, 0)
                 end
             end
         end
     end
 })
 
+-- Teleports
 local Section = Tab:AddSection({Name = "Teleports"})
-
 local Dropdown = Tab:AddDropdown({
     Name = "To boss",
     Default = "",
@@ -193,56 +162,6 @@ local Dropdown = Tab:AddDropdown({
     },
     Callback = function(Value)
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
-            game.Workspace.mobs.BOSS:FindFirstChild(Value).WorldPivot *
-                CFrame.new(0, 0, -50)
+            game.Workspace.mobs.BOSS:FindFirstChild(Value).WorldPivot * CFrame.new(0, 0, -50)
     end
-})
-
-local Section = Tab:AddSection({Name = "Rejoin"})
-
-local TeleportService = game:GetService("TeleportService")
-local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
-
-local player = Players.LocalPlayer
-local placeId = game.PlaceId
-
--- Function to get servers
-local function GetServers(cursor)
-    local url = "https://games.roblox.com/v1/games/" .. placeId ..
-                    "/servers/Public?sortOrder=Asc&limit=100"
-    if cursor then url = url .. "&cursor=" .. cursor end
-    local response = HttpService:JSONDecode(game:HttpGet(url))
-    return response
-end
-
--- Function to rejoin on a different server
-local function RejoinDifferentServer()
-    local servers = GetServers()
-    for _, server in ipairs(servers.data) do
-        if server.id ~= game.JobId and server.playing < server.maxPlayers then
-            TeleportService:TeleportToPlaceInstance(placeId, server.id, player)
-            return
-        end
-    end
-
-    if servers.nextPageCursor then
-        local nextServers = GetServers(servers.nextPageCursor)
-        for _, server in ipairs(nextServers.data) do
-            if server.id ~= game.JobId and server.playing < server.maxPlayers then
-                TeleportService:TeleportToPlaceInstance(placeId, server.id,
-                                                        player)
-                return
-            end
-        end
-    end
-
-    -- fallback: normal rejoin
-    TeleportService:Teleport(placeId, player)
-end
-
--- Add button inside your OrionLib Rejoin section
-Tab:AddButton({
-    Name = "Rejoin to Different Server",
-    Callback = function() RejoinDifferentServer() end
 })
