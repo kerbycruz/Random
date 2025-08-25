@@ -198,3 +198,51 @@ local Dropdown = Tab:AddDropdown({
     end
 })
 
+local Section = Tab:AddSection({Name = "Rejoin"})
+
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
+local placeId = game.PlaceId
+
+-- Function to get servers
+local function GetServers(cursor)
+    local url = "https://games.roblox.com/v1/games/" .. placeId ..
+                    "/servers/Public?sortOrder=Asc&limit=100"
+    if cursor then url = url .. "&cursor=" .. cursor end
+    local response = HttpService:JSONDecode(game:HttpGet(url))
+    return response
+end
+
+-- Function to rejoin on a different server
+local function RejoinDifferentServer()
+    local servers = GetServers()
+    for _, server in ipairs(servers.data) do
+        if server.id ~= game.JobId and server.playing < server.maxPlayers then
+            TeleportService:TeleportToPlaceInstance(placeId, server.id, player)
+            return
+        end
+    end
+
+    if servers.nextPageCursor then
+        local nextServers = GetServers(servers.nextPageCursor)
+        for _, server in ipairs(nextServers.data) do
+            if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                TeleportService:TeleportToPlaceInstance(placeId, server.id,
+                                                        player)
+                return
+            end
+        end
+    end
+
+    -- fallback: normal rejoin
+    TeleportService:Teleport(placeId, player)
+end
+
+-- Add button inside your OrionLib Rejoin section
+Tab:AddButton({
+    Name = "Rejoin to Different Server",
+    Callback = function() RejoinDifferentServer() end
+})
