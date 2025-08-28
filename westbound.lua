@@ -332,7 +332,7 @@ local safetyToggle = createToggle("Safety Features", ControlsFrame, config.safet
 end)
 
 -- Add sliders
-local delaySlider = createSlider("Action Delay", ControlsFrame, 0.01, 1, configg.actionDelay, function(value)
+local delaySlider = createSlider("Action Delay", ControlsFrame, 0.01, 1, config.actionDelay, function(value)
     config.actionDelay = value
 end)
 
